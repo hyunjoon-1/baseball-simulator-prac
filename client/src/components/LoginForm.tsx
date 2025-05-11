@@ -20,7 +20,7 @@ export function LoginForm() {
       sessionStorage.setItem("user", JSON.stringify(userInfo.user));
 
       // 로그인 성공 후 이동할 페이지로 리다이렉트
-      navigate("/SelectTeamPage");
+      navigate("/select-team");
     } else {
       console.log("로그인 실패");
     }
