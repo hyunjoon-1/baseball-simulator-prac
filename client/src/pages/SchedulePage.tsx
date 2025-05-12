@@ -1,42 +1,38 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { teams } from "../data/Teams";
-// Match 타입 가져오기
+import { useState,useEffect } from 'react'
+import { useLocation, useNavigate } from "react-router-dom";
+import type { Team } from "../types/Team";
 import type { Match } from "../types/Match";
 import { ModeModal } from "../components/ModeModal";
 import { GameMatch } from "../components/GameMatch";
 
 export function SchedulePage() {
-  const { myTeam } = useParams();
+  const location = useLocation();
+  const { myTeam, teams }: { myTeam: Team; teams: Team[] } = location.state;
+
   const [schedule, setSchedule] = useState<Match[]>([]);
   const [selectMode, setSelectMode] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (myTeam && teams.length > 0) {
+      const otherTeams = teams.filter(t => t.name !== myTeam.name);
+      const randomOpponent = otherTeams[Math.floor(Math.random() * otherTeams.length)];
 
-    if (myTeam) {
-      // 상대팀 랜덤으로 설정
-      const randomTeam = Math.floor(Math.random() * teams.length);
-      // 내 팀과 랜덤팀 경기
-      const myMatch = { home: myTeam, away: teams[randomTeam]! };
-
-      const otherTeams = [...teams];
-      // 내 팀과 경기하는 팀 뺴기
-      otherTeams.splice(randomTeam, 1);
-
+      const remainingTeams = otherTeams.filter(t => t.name !== randomOpponent.name);
       const otherMatches = [];
-      while (otherTeams.length >= 2) {
-        const home = otherTeams.pop()!;
-        const away = otherTeams.pop()!;
-        otherMatches.push({ home, away });
+      while (remainingTeams.length >= 2) {
+        const home = remainingTeams.pop()!;
+        const away = remainingTeams.pop()!;
+        otherMatches.push({ home: home.name, away: away.name });
       }
-      
+
+      const myMatch = { home: myTeam.name, away: randomOpponent.name };
       setSchedule([myMatch, ...otherMatches]);
-      }
-  }, [myTeam]);
-  
-  // 게임 시작 버튼 클릭 시
+    }
+  }, [myTeam, teams]);
+
   const startGame = () => setSelectMode(true);
+
   const modeSelect = (mode: string) => {
     setSelectMode(false);
     console.log(`경기 진행 방식: ${mode}`);
@@ -44,21 +40,22 @@ export function SchedulePage() {
       state: {
         myTeam,
         schedule,
-        mode
-      }
+        mode,
+      },
     });
-  }
-  
+  };
+
   return (
     <div>
-      <h1>{myTeam}</h1>
+      <h1>{myTeam.name}</h1>
       <p>일정을 확인하세요</p>
       <div>
-        {schedule.map((match, index) => (<GameMatch key={index} match={match} />))}
+        {schedule.map((match, index) => (
+          <GameMatch key={index} match={match} />
+        ))}
       </div>
-
       <button onClick={startGame}>게임 시작</button>
       {selectMode && <ModeModal onSelect={modeSelect} />}
     </div>
-  )
+  );
 }

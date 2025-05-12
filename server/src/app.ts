@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import session from 'express-session';
 import { router as loginRouter} from './routes/login';
-
+import { router as teamsRouter } from './routes/teams';
 
 const app = express();
 
@@ -23,5 +23,6 @@ app.use(session({
 }))
 
 app.use("/login", loginRouter);
+app.use("/teams", teamsRouter);
 
 export default app;

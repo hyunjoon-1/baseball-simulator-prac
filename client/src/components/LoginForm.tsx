@@ -1,7 +1,7 @@
 // * 로그인 폼 컴포넌트
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../services/Auth";
+import { login } from "../services/authService";
 
 export function LoginForm() {
   // 아이디, 비밀번호 상태 관리
